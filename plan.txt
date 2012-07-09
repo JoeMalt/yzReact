@@ -1,0 +1,86 @@
+yzReact CODE STRUCTURE
+
+=====test.php=====
+Takes SESSION param(s): user ID, sem_field_pair_id
+Sends data to test_process.php
+    Parameters: session_id, time, was_correct, sem_field_pair_id
+
+
+=====pretest.php=====
+Reads SESSION data and says how many tests taken/wanted
+Click link to test.php
+
+=====test_process.php=====
+Inserts parameters from test.php into the database
+Increments a SESSION variable: tests_taken
+If SESSION['tests_taken'] < SESSION['tests_desired'], redirects via 301 back to test.php else goes to pretest.php
+
+
+=====session_initialise.php===== DONE
+Takes POST parameter: session_id
+Retrieves details of intended session from DB (sem_field_pair_id, tests_desired) and loads them into SESSION
+Initiates test.php for the first time
+
+
+=====session_conclude.php=====
+Destroys session, displays a "thank you" message
+
+
+
+yzReact ADMIN CONTROL PANEL
+
+=====adm/add_sem_field_pair.php=====
+Takes a name and two data sets (text files with words separated by \n), as well as position information (T or B)
+Position info may be extended in the future to include things like text formatting
+
+
+=====adm/view_overall_data.php=====
+Displays the aggregated data from the database
+
+
+
+
+yzReact SESSION VARIABLES
+
+*int tests_taken
+*int tests_desired
+*int session_id (May or may not be used, useful to have)
+*int sem_field_pair_id
+
+
+
+
+yzReact DATABASE DESIGN
+
+=====Table RESULTS=====
+int auto_increment result_id (Primary key)
+int sem_field_pair_id
+int time (Time taken in milliseconds)
+bool orientation (TRUE if "right" way round, "false" otherwise)
+bool correct
+
+=====Table SEM_FIELD_PAIRS=====
+int sem_field_pair_id (primary key, useful)
+string sem_field_a_file (Location of text file containing words separated by \n)
+char sem_field_a_orientation (Currently H or L)
+string sem_field_b_file (Location of text file containing words separated by \n)
+char sem_field_b_orientation (Currently H or L)
+
+=====Table SESSIONS=====
+int session_id
+int tests_desired
+int sem_field_pair_id
+bool begun
+bool complete
+
+
+yzReact FILE FORMAT
+Word lists should be in plain ASCII, with *nix newlines (CRLF probably won't work)
+
+
+yzReact TODO
+- Make was_correct feed to the DB properly
+- Escape database stuff, preferably get MySQLi to work
+- Obfuscate / POST test responses
+- Add detail to session_initialise.php
+

@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>JSdemo</title>
+<!-- An ugly behemoth of JS functions. -->
+<script language="Javascript" type="text/javascript">
+function doStuffOnLoad() //This is a master function which is called by body onload and (mainly) calls other functions
+{
+	setDivsOnLoad();
+	setHeights();
+    document.getElementById('upper').focus(); //Focus on this div as it's handling onKeyDown events. Super-kludgy.
+}
+
+//TEST VARIABLES - PHP will set these automagically
+var word = "PHP_WORD";
+var sem_field_id = "PHP_SEM_FIELD_ID"; //Either 1 or 2, set by PHP
+var orientation = "PHP_ORIENTATION"; //"U" for up, "D" for down (case-sensitive)
+var correct_orientation = "PHP_CORRECT_ORIENTATION";
+if (orientation == correct_orientation)
+{
+    var is_orientation_correct = 1;
+}
+else
+{
+    var is_orientation_correct = 2;
+}
+
+var state = 1; //This stores the state: 1 is "Press A to begin", 2 is the actual test
+var start_time;
+var pos_chosen;
+var was_correct;
+
+function setHeights() //When the page loads, set the div heights. Kludgy, but easier that trying to make height percentages work
+{
+	var height = window.innerHeight;
+	var heightdiv3 = height /3; //Calculate the height for each div
+	document.getElementById('upper').style.height = heightdiv3+'px';
+	document.getElementById('middle').style.height = heightdiv3+'px';
+	document.getElementById('lower').style.height = heightdiv3+'px';	
+}
+
+function microtime (get_as_float) //This function from http://phpjs.org/functions/microtime:472 CREDIT THIS
+{
+    // Returns either a string or a float containing the current time in seconds and microseconds  
+    // 
+    // version: 1109.2015
+    // discuss at: http://phpjs.org/functions/microtime
+    // +   original by: Paulo Freitas
+    // *     example 1: timeStamp = microtime(true);
+    // *     results 1: timeStamp > 1000000000 && timeStamp < 2000000000
+    var now = new Date().getTime() / 1000;
+    var s = parseInt(now, 10);
+ 
+    return (get_as_float) ? now : (Math.round((now - s) * 1000) / 1000) + ' ' + s;
+}
+
+function setDivsOnLoad() //This puts the right contents into the spans inside the divs
+{
+	document.getElementById('span_upper').innerHTML = "";
+	document.getElementById('span_lower').innerHTML = "";
+	document.getElementById('span_middle').innerHTML = "Press the S key to begin. Press A for \"High\", D for \"Low\"";
+}
+
+function wipeAllDivs() //General usefulness function
+{
+    document.getElementById('span_upper').innerHTML = "";
+    document.getElementById('span_middle').innerHTML = "";
+    document.getElementById('span_lower').innerHTML = "";
+}
+function keyPressHandler(event) //Handles all key presses, passes them on as appropriate
+{
+    var keycode = event.keyCode;
+    var keychar = String.fromCharCode(keycode);
+    if (state == 1 && keychar == "S")
+    { 
+        state = 2;
+        showWord(keychar);
+        document.getElementById('span_middle').innerHTML = "";
+    }
+	else if(state == 2) //If the state flag is set to 2, the word is already showing, so we call stopTimer()
+	{
+		stopTimer(keychar);
+	}
+		
+}
+function showWord(keychar)
+{
+	start_time = microtime(1);
+    if (orientation == "U")
+    {
+        document.getElementById('span_upper').innerHTML = word;
+    }
+    if (orientation == "D")
+    {
+        document.getElementById('span_lower').innerHTML = word;
+    }
+}
+function stopTimer(keychar)
+{
+	var end_time = microtime(1);
+	var time = end_time - start_time;
+	wipeAllDivs(); //Reset all three boxes to do more writing
+	document.getElementById('span_middle').innerHTML = "Thank you.";
+	if (keychar == "A")
+	{
+		pos_chosen = "U";
+	}
+	else if (keychar == "D")
+	{
+		pos_chosen = "D";
+	}
+    if (pos_chosen == correct_orientation)
+    {
+        was_correct = true;
+    }
+    else
+    {
+        was_correct = false;
+    }
+    document.getElementById('span_upper').innerHTML = "<a href=\"test_process.php?was_correct="+was_correct+"&time="+time+"&word="+word+"&sem_field_id="+sem_field_id+"&orientation_corr="+is_orientation_correct+"\">Please click here to continue</a>";
+}
+
+
+</script>
+
+<style>
+
+body
+{
+	margin:0; 
+	padding:0;
+	height: 100%;
+}
+#upper
+{
+	background-color: #AAAAFF;
+	width: 100%;
+	text-align: center;
+	display: table;
+}
+#middle
+{
+	background-color: #FFAAAA;
+	height: 32%;
+	width: 100%;
+	text-align: center;
+	display: table;
+}
+#lower
+{
+	background-color: #AAFFAA;
+	height: 32%;
+	width: 100%;
+	text-align: center;
+	display: table;
+}
+.middletext
+{
+	display: table-cell;
+	vertical-align: center;
+	margin-top: 30%;
+	margin-left: auto;
+	margin-right: auto;
+	padding-top: 10%;
+}
+</style>
+</head>
+
+<body onload="doStuffOnLoad()">
+	<div id="container">
+		<div id="upper" tabindex="0" onkeydown="keyPressHandler(event)" style="height: 0px; ">
+			<span id="span_upper" class="middletext"></span> 
+		</div>
+
+		<div id="middle" style="height: 0px; ">
+			<span id="span_middle" class="middletext">Press the S key to begin. Press A for "High", B for "Low"</span>
+		</div>
+
+		<div id="lower" style="height: 0px; ">
+			<span id="span_lower" class="middletext"></span>
+		</div>
+	</div>
+
+</body></html>
