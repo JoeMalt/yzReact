@@ -4,10 +4,10 @@ $session_id = (integer) $_SESSION['session_id'];
 $time = (float) $_GET['time'];
 $word = $_GET['word'];
 $correct = (string) $_GET['was_correct'];
-$orientation_correct = $_GET['orientation'];
 $sem_pair_id = $_GET['sem_field_id'];
 $sem_field_pair_id = (integer) $_SESSION['sem_field_pair_id'];
 $is_orientation_correct = $_GET['orientation_corr'];
+echo "is_orientation_correct is $is_orientation_correct";
 
 //Increment $tests_taken
 $_SESSION['tests_taken']++;

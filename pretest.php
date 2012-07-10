@@ -10,7 +10,8 @@ $message = <<< EOT
 Your session ID is {$_SESSION['session_id']}. <br />
 You have taken {$_SESSION['tests_taken']} tests so far. <br />
 You have $tests_remaining to go. <br />
-Please do not hesitate to ask if you have any problems. <br />
+Please do not hesitate to ask if you have any problems. <br /><br />
+During the test, you will use buttons on the keyboard. Do not click anywhere on the screen except on the "Please click here to continue" link which will appear once you have submitted your choice. <br /><br />
 When you are ready to take the next test, please <a href='test.php'>click here.</a>
 EOT;
 ?>

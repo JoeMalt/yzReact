@@ -34,13 +34,13 @@ $_SESSION['tests_taken'] = 0;
 
 if ($status != "A" && $num_rows == 1) //If this is the case, the session must already be active or dead
 {
-    echo "This session has already been started. Please request a new session code.";
+    echo "This session has already been started. Please request a new session ID.";
     die();
 }
 
 if($num_rows == 0) //If this is true, the session doesn't exist.
 {
-    echo "The session code you have entered could not be found in the database.";
+    echo "The session code you have entered could not be found in the database. Please try re-entering it.";
     die();
 }
 else
@@ -48,7 +48,7 @@ else
     $result = $db->query("UPDATE sessions SET status = \"B\" WHERE session_id = $session_id");
     if (!$result)
     {
-        echo "Database error (SELECT query returned false)";
+        echo "Database error (UPDATE query returned false)";
     }
 }
 
@@ -60,6 +60,6 @@ else
 <html>
 <head><title>yzReact - Session initialised</title></head>
 <body>
-Session started. You will take <?php echo $tests_desired; ?> tests.
+Session started. You will take <?php echo $tests_desired; ?> tests. Please <a href='pretest.php'>click here to continue</a>
 </body>
 </html>

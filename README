@@ -1,0 +1,13 @@
+yzReact - A PHP / MySQL / JavaScript reaction timing system.
+
+This program exists to answer a question: when people are viewing words which imply a metaphorical position, such as "King" or "Servant", are they quicker and/or more accurate in identifying them when they are placed in the corresponding area of the screen.
+
+It is currently VERY UNFINISHED. It is vulnerable to SQL injection, the interface is practically non-existent and there is no admin panel yet. I recommend you do not use it yet.
+
+License:
+yzReact is licensed under the Creative Commons "Attribution-NonCommercial-ShareAlike 3.0 Unported" license.
+Essentially:
+You are free to share and modify it (please feel free to fork this repo), on these conditions:
+- Non-commercial use only
+- Share-alike (Any works based on this must be distributed under the same license
+- Attribution

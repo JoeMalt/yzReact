@@ -1,3 +1,5 @@
 servant
 employee
 slave
+worker
+peasant
