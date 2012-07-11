@@ -34,12 +34,10 @@ if ($time >9999.99)
 
 include 'dbconn.php';
 $db = connect(); //Connect to MySQL, get a DB handle
-$result = $db->query("INSERT INTO results (sem_field_pair_id,word,time,correct,session_id, is_orientation_correct) VALUES ($sem_field_pair_id,'$word',$time,$correct,$session_id,$is_orientation_correct)"); //I cannot get the prepared statements to work, this is a stopgap solution until I'm more awake :/
-if (!$result)
-{
-    echo "Database query failed - please see staff";
-    die();
-}
+//$result = $db->query("INSERT INTO results (sem_field_pair_id,word,time,correct,session_id, is_orientation_correct) VALUES ($sem_field_pair_id,'$word',$time,$correct,$session_id,$is_orientation_correct)"); //I cannot get the prepared statements to work, this is a stopgap solution until I'm more awake :/
+$stmt = $db->prepare("INSERT INTO results (sem_field_pair_id,word,time,correct,session_id, is_orientation_correct) VALUES ?,?,?,?,?,?");
+$stmt->bind_param("isdiii",$sem_field_pair_id,'$word',$time,$correct,$session_id,$is_orientation_correct);
+$stmt->execute();
 
 //If there are more tests to be taken, redirect to them, else redirect to the ending page
 if ($_SESSION['tests_taken'] < $_SESSION['tests_desired'])
