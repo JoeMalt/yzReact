@@ -3,7 +3,7 @@
 1. Load session variables and generate random data as necessary
 2. Connect to MySQL to get the necessary data (including word list locations)
 3. Read the word lists and select the word
-4. Load in test_base.htm and str_replace() in the appropriate variables
+4. Load in test_static.htm and str_replace() in the appropriate variables
 5. Echo the whole thing to the user.
 */
 session_start();
