@@ -30,6 +30,7 @@ $_SESSION['tests_desired'] = $tests_desired;
 $_SESSION['sem_field_pair_id'] = $sem_field_pair_id;
 $_SESSION['status'] = $status;
 $_SESSION['tests_taken'] = 0;
+$_SESSION['had_words'] = array();
 
 
 if ($status != "A" && $num_rows == 1) //If this is the case, the session must already be active or dead

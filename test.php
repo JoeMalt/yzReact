@@ -1,13 +1,5 @@
 <?php
-/* This file provides the UI in which the test is actually taken. It works as follows:
-1. Load session variables and generate random data as necessary
-2. Connect to MySQL to get the necessary data (including word list locations)
-3. Read the word lists and select the word
-4. Load in the base test file and str_replace() in the appropriate variables
-5. Echo the whole thing to the user.
 
-It is an ugly mass of PHP.
-*/
 session_start();
 
 include 'dbconn.php';
@@ -16,59 +8,102 @@ $db = connect(); //Connect to MySQL, $db is a MySQLi database object
 //We need this for the SQL queries
 $sem_field_pair_id = $_SESSION['sem_field_pair_id'];
 
-//Decide whether to use text A or B from the pair (1 = use A, 2 = use B)
+//Decide whether to use wordset A or B, for some god-unknown reason stored as a number (what was I thinking?)
+//If we're out of words, we try the other word set. If we're still out of words, we give up and end the test.
+//THe old system of $_SESSION['tests_desired'] can be thrown out of the window
 $a_or_b = mt_rand(1,2);
 
-$will_be_correct = mt_rand(0,1);
-
-
-//Initialise the SQL to get the word list location
-$result = $db->query("SELECT * FROM sem_field_pairs WHERE sem_field_pair_id = $sem_field_pair_id");
-$result_array = $result->fetch_assoc();
-
-//Depending on whether we're using set A or B, load the appropriate one:
-if ($a_or_b == 1)
+function getRemainingWords($a_or_b)
 {
-    $file = $result_array['sem_field_a_file'];
-    $correct_orientation = $result_array['sem_field_a_orientation'];
-}
-elseif ($a_or_b == 2)
-{
-    $file = $result_array['sem_field_b_file'];
-    $correct_orientation = $result_array['sem_field_b_orientation'];
-}
-$help_message = $result_array['help_message']; //The help message is the "Press S to begin..." instructions
+/*
+    This function returns:
+        * An array of remaining words
+*/
+    global $db;
+    global $sem_field_pair_id;
+    //Initialise the SQL to get the word list location
+    $result = $db->query("SELECT * FROM sem_field_pairs WHERE sem_field_pair_id = $sem_field_pair_id");
+    $result_array = $result->fetch_assoc();
 
-//If $will_be_correct is 1, we tell the JS to orient the word as $correct_orientation from the DB, otherwise we invert it
-if($correct_orientation == "U" && $will_be_correct)
-{
-    $forjs_orientation = "U";
-}
-if($correct_orientation == "U" && !$will_be_correct)
-{
-    $forjs_orientation = "D";
-}
-if($correct_orientation == "D" && $will_be_correct)
-{
-    $forjs_orientation = "D";
-}
-if($correct_orientation == "D" && !$will_be_correct)
-{
-    $forjs_orientation = "U";
-}
-$wordlist = file_get_contents($file); //Open the word list file and convert it to an array
-$wordlist = explode("\n",$wordlist);
-array_pop($wordlist); //The last element appears to be a blank string, so we strip it off here.
-$word = $wordlist[array_rand($wordlist)]; //Pick a random word.
+    //Depending on whether we're using set A or B, load the appropriate one:
+    if ($a_or_b == 1)
+    {
+       $file = $result_array['sem_field_a_file'];
+      $correct_orientation = $result_array['sem_field_a_orientation'];
+    }
+    elseif ($a_or_b == 2)
+    {
+        $file = $result_array['sem_field_b_file'];
+        $correct_orientation = $result_array['sem_field_b_orientation'];
+    }
 
+    //We now have the location of the word lists, let's get the words
+    $wordlist = file_get_contents($file);
+    $words = explode("\n",$wordlist);
+    
+    //We create the array words_remaining by comparing $words against $_SESSION['had_words']
+    $words_remaining = array();
+    foreach($words as $word)
+    {
+        if(!in_array($word,$_SESSION['had_words']))
+        {
+            $words_remaining[] = $word;
+        }
+    }
+    //Get rid of the last blank line in the word list
+    array_pop($words_remaining);
+    return $words_remaining;
+    //Get rid of the last blank line in the word list
 
-//Now for the nasty bit. Load the JS file and str_replace() in the variables. Inefficient, but I've already written all the JS.
-$page = file_get_contents("test_static_new.php");
-$page = str_replace("PHP_WORD",$word,$page);
-$page = str_replace("PHP_SEM_FIELD_ID",($a_or_b == 1 ? "A" : "B"),$page);
-$page = str_replace("PHP_ORIENTATION",$forjs_orientation,$page);
-$page = str_replace("PHP_CORRECT_ORIENTATION",$correct_orientation,$page);
-$page = str_replace("PHP_HELP_MESSAGE",$help_message,$page);
-echo $page; //Step seven - the entire page is in this string, so we echo it out.
+}
+
+function getWord($a_or_b)
+{
+    /*
+    This function does not return a string, rather:
+    * an array, containing the word, what set it is *actually* in, see above and any other data
+    * FALSE if we're out of words
+    */
+    $words_remaining = getRemainingWords($a_or_b);
+
+    //Get rid of the last blank line in the word list
+    array_pop($words_remaining);
+    //If we haven't got any remaining words, we try the other set
+    if(empty($words_remaining))
+    {
+        $a_or_b = ($a_or_b == 1) ? 2 : 1; //Switch 1 for 2 to search the other word list
+        $words_remaining = getRemainingWords($a_or_b); //The ternary here just swaps 1 and 2
+        //If we still haven't got any words, the survey is over
+        if(empty($words_remaining))
+        {
+            header("Location: session_conclude.php");
+            die("Thank you for taking this test");
+        }
+    }
+    //Now we have a non-empty $words_remaining, we select a word
+    $word = $words_remaining[array_rand($words_remaining)];
+
+    //The whole point of this code is to stop the word coming up again, so...
+    $_SESSION['had_words'][] = $word;
+
+    $a_or_b_char = ($a_or_b == 1) ? "A" : "B";
+
+    /*START DEBUG ECHO-ING*/
+    echo $word . "<br /><br />";
+    var_dump($words_remaining);
+    echo "<br /><br />";
+    var_dump($_SESSION);
+    echo "<br /><br />Leaving function<br /><br />";
+    /*END DEBUG ECHO-ING*/
+
+    /*Now we need to return the data, which we do as a two-element array:
+        * The word, as a string
+        * Whether it came from set A or B, as a single char
+    */
+    return array($word,$a_or_b_char);
+}
+echo "vardumping getWord(): <br />";
+var_dump(getWord(mt_rand(1,2)));
+echo "<br /><br />End vardumping getWord() <br />";
 ?>
 
