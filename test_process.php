@@ -3,11 +3,11 @@ session_start();
 $session_id = (integer) $_SESSION['session_id'];
 $time = (float) $_GET['time'];
 $word = $_GET['word'];
-$correct = (string) $_GET['was_correct'];
-$sem_pair_id = $_GET['sem_field_id'];
+$correct = $_GET['was_correct'];
+$sem_field_id = $_GET['sem_field_id'];
 $sem_field_pair_id = (integer) $_SESSION['sem_field_pair_id'];
-$is_orientation_correct = $_GET['orientation_corr'];
-echo "is_orientation_correct is $is_orientation_correct";
+$is_orientation_correct = $_GET['is_orientation_correct'];
+$result_in_session = $_SESSION['tests_taken'] + 1;
 
 //Increment $tests_taken
 $_SESSION['tests_taken']++;
@@ -30,19 +30,21 @@ if ($time >9999.99)
     die("Variable time was too large - please see staff.");
 }
 
-//ESCAPE THIS BEFORE PUBLIC RELEASE!!!!!
 
 include 'dbconn.php';
 $db = connect(); //Connect to MySQL, get a DB handle
-//$result = $db->query("INSERT INTO results (sem_field_pair_id,word,time,correct,session_id, is_orientation_correct) VALUES ($sem_field_pair_id,'$word',$time,$correct,$session_id,$is_orientation_correct)"); //I cannot get the prepared statements to work, this is a stopgap solution until I'm more awake :/
-$stmt = $db->prepare("INSERT INTO results (sem_field_pair_id,word,time,correct,session_id, is_orientation_correct) VALUES ?,?,?,?,?,?");
-$stmt->bind_param("isdiii",$sem_field_pair_id,'$word',$time,$correct,$session_id,$is_orientation_correct);
+$stmt = $db->prepare("INSERT INTO results (sem_field_id,sem_field_pair_id,word,time,correct,session_id,is_orientation_correct,result_in_session) VALUES (?,?,?,?,?,?,?,?)");
+$stmt->bind_param("sisdiiii",$sem_field_id,$sem_field_pair_id,$word,$time,$correct,$session_id,$is_orientation_correct,$result_in_session);
+if(!$stmt)
+{
+    die("Error (MySQLi statement build failed)");
+}
 $stmt->execute();
 
 //If there are more tests to be taken, redirect to them, else redirect to the ending page
 if ($_SESSION['tests_taken'] < $_SESSION['tests_desired'])
 {
-    header("Location: pretest.php?f=tp");
+    header("Location: test.php?taken=$_SESSION[tests_taken]&total=$_SESSION[tests_desired]");
 }
 else
 {

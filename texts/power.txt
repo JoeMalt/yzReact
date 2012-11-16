@@ -2,9 +2,9 @@ king
 emperor
 ruler
 commander
-monarch
-archbishop
+master
+chief
 boss
-dictator
-prime minister
-president
+manager
+professor
+queen

@@ -1,0 +1,14 @@
+body
+{
+    background-image:url('bg.png');
+}
+div#main
+{
+    border-radius: 5px;
+    border: 3px solid grey;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 3em;
+    width: 55%;
+    padding: 0.5em;
+}

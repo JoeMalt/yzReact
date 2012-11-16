@@ -1,0 +1,42 @@
+body,html
+{
+    height:100%;
+}
+
+div#main-container
+{
+    height: 100%;
+}
+
+div.yzreact-row
+{
+    width: 100%;
+    margin: 0;
+    height: 33.3%;
+    text-align: center;
+    padding-top: 0%;
+    padding-bottom: 0%;
+    display: table;
+}
+
+div.yzreact-row-text
+{
+    vertical-align:middle;
+    height: 10%;
+    display: table-cell
+}
+
+
+/*The weird colors are for development */
+div#yzreact-row-top
+{
+    background-color: rgb(200,220,134);
+}
+div#yzreact-row-middle
+{
+    background-color: rgb(220,230,200);
+}
+div#yzreact-row-bottom
+{
+    background-color: rgb(2400,190,164);
+}

@@ -79,8 +79,5 @@ Word lists should be in plain ASCII, with *nix newlines (CRLF probably won't wor
 
 
 yzReact TODO
-- Make was_correct feed to the DB properly
-- Escape database stuff, preferably get MySQLi to work
 - Obfuscate / POST test responses
-- Add detail to session_initialise.php
 

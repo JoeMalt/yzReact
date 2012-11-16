@@ -58,8 +58,9 @@ else
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head><title>yzReact - Session initialised</title></head>
+<head><title>yzReact - Session initialised</title><link rel="stylesheet" type="text/css" href="general.css" /></head>
 <body>
-Session started. You will take <?php echo $tests_desired; ?> tests. Please <a href='pretest.php'>click here to continue</a>
+<div id="main">
+Session started. You will take <?php echo $tests_desired; ?> tests. <strong>During the test, please do not use your mouse</strong>. Place your ring, middle and index fingers on the keys A, S and D - you will be pressing these keys only. When you are ready, please <a href='test.php'>click here to continue</a></div>
 </body>
 </html>

@@ -3,3 +3,8 @@ employee
 slave
 worker
 peasant
+student
+cleaner
+maid
+butler
+labourer
